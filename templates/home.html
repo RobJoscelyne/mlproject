@@ -1,0 +1,102 @@
+<html>
+<body>
+    <div class="login">
+        <h1>Flight Delay Prediction Tool</h1>
+
+        <form action="{{ url_for('predict_datapoint')}}" method="post">
+            <h1>
+                <legend>Flight Delay Prediction</legend>
+            </h1>
+
+            <!-- Month -->
+            <div class="mb-3">
+                <label class="form-label">Month</label>
+                <select class="form-control" name="MONTH" required>
+                    <option selected disabled value="">Select Month</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
+
+            <!-- Day of Week -->
+            <div class="mb-3">
+                <label class="form-label">Day of Week</label>
+                <select class="form-control" name="DAY_OF_WEEK" required>
+                    <option selected disabled value="">Select Day of Week</option>
+                    <option value="1">Sunday</option>
+                    <option value="2">Monday</option>
+                    <option value="3">Tuesday</option>
+                    <option value="4">Wednesday</option>
+                    <option value="5">Thursday</option>
+                    <option value="6">Friday</option>
+                    <option value="7">Saturday</option>
+                </select>
+            </div>
+
+            <!-- Carrier -->
+            <div class="mb-3">
+                <label class="form-label">Airline Carrier</label>
+                <select class="form-control" name="OP_UNIQUE_CARRIER" required>
+                    <option selected disabled value="">Select Carrier</option>
+                    <option value="AA">AA</option>
+                    <option value="OO">OO</option>
+                    <option value="B6">B6</option>
+                    <option value="9E">9E</option>
+                    <option value="DL">DL</option>
+                    <option value="YX">YX</option>
+                    <option value="UA">UA</option>
+                    <option value="MQ">MQ</option>
+                </select>
+            </div>
+
+            <!-- Origin Airport -->
+            <div class="mb-3">
+                <label class="form-label">Origin Airport</label>
+                <select class="form-control" name="ORIGIN" required>
+                    <option selected disabled value="">Select Origin Airport</option>
+                    <option value="LGA">LGA</option>
+                    <option value="JFK">JFK</option>
+                    <option value="HPN">HPN</option>
+                </select>
+            </div>
+
+            <!-- Destination Airport -->
+            <div class="mb-3">
+                <label class="form-label">Destination Airport</label>
+                <select class="form-control" name="DEST" required>
+                    <option selected disabled value="">Select Destination Airport</option>
+                    <option value="ORD">ORD</option>
+                </select>
+            </div>
+
+            <!-- Scheduled Departure Time (CRS_DEP_TIME) -->
+            <div class="mb-3">
+                <label class="form-label">Scheduled Departure Time</label>
+                <input type="number" class="form-control" name="CRS_DEP_TIME" 
+                    pattern="^(?:[01][0-9]|2[0-3])[0-5][0-9]$" 
+                    placeholder="HHMM (0000 to 2359)" required>
+                <small class="form-text text-muted">Enter time as HHMM (0000 to 2359).</small>
+            </div>
+
+            <div class="mb-3">
+                <input class="btn btn-primary" type="submit" value="Estimate Flight Delay" required />
+            </div>
+        
+        </form>
+        <h2>
+            The prediction is {{ results }}
+        </h2>
+            
+    </div>
+</body>
+</html>

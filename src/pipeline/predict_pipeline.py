@@ -1,80 +1,54 @@
+import sys
 import os
 import pandas as pd
-import pickle
-from src.utils import load_object
 from src.exception import CustomException
+from src.utils import load_object
 
 class PredictPipeline:
-    def __init__(self, model_path=None, preprocessor_path=None):
-        self.model_path = model_path or 'C:\\Users\\robjo\\mlproject\\artifacts\\model1.pkl'
-        self.preprocessor_path = preprocessor_path or 'C:\\Users\\robjo\\mlproject\\artifacts\\proprocessor.pkl'
+    def __init__(self):
+        pass
 
     def predict(self, features):
         try:
-            print("Loading model from:", self.model_path)
-            with open(self.model_path, 'rb') as file:
-                model = pickle.load(file)
+            model_path = os.path.join("artifacts", "model.pkl")
+            # Correct path for the preprocessor
+            preprocessor_path = os.path.join('artifacts', 'proprocessor.pkl')  # Updated path
 
-            # Workaround for the gpu_id attribute error in XGBoost model
-            if hasattr(model, 'get_xgb_params'):
-                original_get_params = model.get_params
+            print("Before Loading")
+            model = load_object(file_path=model_path)
+            preprocessor = load_object(file_path=preprocessor_path)
+            print("After Loading")
 
-                def patched_get_params(deep=True): 
-                    try:
-                        return original_get_params(deep=deep)
-                    except AttributeError as e:
-                        if str(e) == "'XGBModel' object has no attribute 'gpu_id'":
-                            return {}
-                        raise e
-
-                model.get_params = patched_get_params
-
-            print("Model loaded successfully.")
-
-            print("Loading preprocessor from:", self.preprocessor_path)
-            with open(self.preprocessor_path, 'rb') as file:
-                preprocessor = pickle.load(file)
-            print("Preprocessor loaded successfully.")
-
-            print("Preprocessing features...")
             data_scaled = preprocessor.transform(features)
-            print("Features preprocessed.")
-
-            print("Making predictions...")
             preds = model.predict(data_scaled)
-            print("Predictions made.")
-
             return preds
-
-        except FileNotFoundError as e:
-            raise CustomException(f"A file was not found: {e.filename}", e)
+        
         except Exception as e:
-            raise CustomException("An error occurred in PredictPipeline", e)
+            raise CustomException(e, sys)
 
 class CustomData:
-    def __init__(self, quarter: str, month: str, day_of_month: str, 
-                 day_of_week: str, op_unique_carrier: str, 
-                 origin: str, dest: str, crs_dep_time: int):
-        
-        self.data = {
-            "QUARTER": quarter,
-            "MONTH": month,
-            "DAY_OF_MONTH": day_of_month,
-            "DAY_OF_WEEK": day_of_week,
-            "OP_UNIQUE_CARRIER": op_unique_carrier,
-            "ORIGIN": origin,
-            "DEST": dest,
-            "CRS_DEP_TIME": crs_dep_time,
-        }
+    def __init__(self, CRS_DEP_TIME: int, MONTH: int, DAY_OF_WEEK: int, 
+                 OP_UNIQUE_CARRIER: str, ORIGIN: str, DEST: str):
 
-    def get_data_as_dataframe(self):
+        self.CRS_DEP_TIME = CRS_DEP_TIME
+        self.MONTH = MONTH
+        self.DAY_OF_WEEK = DAY_OF_WEEK
+        self.OP_UNIQUE_CARRIER = OP_UNIQUE_CARRIER
+        self.ORIGIN = ORIGIN
+        self.DEST = DEST
+
+    def get_data_as_data_frame(self):
         try:
-            return pd.DataFrame([self.data])
-        except Exception as e:
-            raise CustomException(f"An error occurred in CustomData: {e}")
+            custom_data_input_dict = {
+                "CRS_DEP_TIME": [self.CRS_DEP_TIME],
+                "MONTH": [self.MONTH],
+                "DAY_OF_WEEK": [self.DAY_OF_WEEK],
+                "OP_UNIQUE_CARRIER": [self.OP_UNIQUE_CARRIER],
+                "ORIGIN": [self.ORIGIN],
+                "DEST": [self.DEST],
+            }
 
-if __name__ == "__main__":
-    custom_data = CustomData("3", "8", "6", "6", "B6", "JFK", "LAX", 1920)
-    pipeline = PredictPipeline()
-    prediction = pipeline.predict(custom_data.get_data_as_dataframe())
-    print("Prediction:", prediction)
+            return pd.DataFrame(custom_data_input_dict)
+
+        except Exception as e:
+            raise CustomException(e, sys)
