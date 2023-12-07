@@ -31,13 +31,12 @@ class DataTransformation:
             numerical_columns = ["CRS_DEP_TIME","MONTH","DAY_OF_WEEK"]
             categorical_columns = [
                 "OP_UNIQUE_CARRIER",
-                "ORIGIN",
-                "DEST",
+                "ORIGIN", "DEST"
             ]
 
             num_pipeline= Pipeline(
                 steps=[
-                ("imputer",SimpleImputer(strategy="median")),
+                #("imputer",SimpleImputer(strategy="median")),
                 ("scaler",StandardScaler())
                 ]
             )
@@ -45,7 +44,7 @@ class DataTransformation:
             cat_pipeline=Pipeline(
 
                 steps=[
-                ("imputer",SimpleImputer(strategy="most_frequent")),
+                #("imputer",SimpleImputer(strategy="most_frequent")),
                 ("one_hot_encoder",OneHotEncoder())
                 #("scaler",StandardScaler(with_mean=False))
                 ]
@@ -80,7 +79,7 @@ class DataTransformation:
             preprocessing_obj=self.get_data_transformer_object()
 
             target_column_name="DEP_DELAY_NEW"
-            numerical_columns = ["CRS_DEP_TIME","MONTH","DAY_OF_WEEK"]
+            numerical_columns = ["CRS_DEP_TIME","MONTH","DAY_OF_WEEK","DEST"]
 
             input_feature_train_df=train_df.drop(columns=[target_column_name],axis=1)
             target_feature_train_df=train_df[target_column_name]

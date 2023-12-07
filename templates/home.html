@@ -1,102 +1,100 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flight Delay Prediction Tool</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
 <body>
-    <div class="login">
-        <h1>Flight Delay Prediction Tool</h1>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <h1 class="card-title text-center">Flight Delay Prediction Tool</h1>
+                <form action="{{ url_for('predict_datapoint')}}" method="post">
+                    <fieldset>
 
-        <form action="{{ url_for('predict_datapoint')}}" method="post">
-            <h1>
-                <legend>Flight Delay Prediction</legend>
-            </h1>
+                        <!-- Month -->
+                        <div class="form-group">
+                            <label for="MONTH">Month</label>
+                            <select class="form-control" id="MONTH" name="MONTH" required>
+                                <option disabled value="">Select Month</option>
+                                {% for month_num, month_name in [('1', 'January'), ('2', 'February'), ('3', 'March'), ('4', 'April'), ('5', 'May'), ('6', 'June'), ('7', 'July'), ('8', 'August'), ('9', 'September'), ('10', 'October'), ('11', 'November'), ('12', 'December')] %}
+                                <option value="{{ month_num }}" {{ 'selected' if request.form.get('MONTH') == month_num else '' }}>{{ month_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
 
-            <!-- Month -->
-            <div class="mb-3">
-                <label class="form-label">Month</label>
-                <select class="form-control" name="MONTH" required>
-                    <option selected disabled value="">Select Month</option>
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
+                        <!-- Day of Week -->
+                        <div class="form-group">
+                            <label for="DAY_OF_WEEK">Day of Week</label>
+                            <select class="form-control" id="DAY_OF_WEEK" name="DAY_OF_WEEK" required>
+                                <option disabled value="">Select Day of Week</option>
+                                {% for day_num, day_name in [('1', 'Sunday'), ('2', 'Monday'), ('3', 'Tuesday'), ('4', 'Wednesday'), ('5', 'Thursday'), ('6', 'Friday'), ('7', 'Saturday')] %}
+                                <option value="{{ day_num }}" {{ 'selected' if request.form.get('DAY_OF_WEEK') == day_num else '' }}>{{ day_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                                                <!-- Carrier -->
+                        <div class="form-group">
+                            <label for="OP_UNIQUE_CARRIER">Airline Carrier</label>
+                            <select class="form-control" id="OP_UNIQUE_CARRIER" name="OP_UNIQUE_CARRIER" required>
+                                <option disabled value="">Select Carrier</option>
+                                {% for carrier_code, carrier_name in [('AA', 'Airline A'), ('OO', 'Airline B'), ('B6', 'Airline C'), ('9E', 'Airline D'), ('DL', 'Airline E'), ('YX', 'Airline F'), ('UA', 'Airline G')] %}
+                                <option value="{{ carrier_code }}" {{ 'selected' if request.form.get('OP_UNIQUE_CARRIER') == carrier_code else '' }}>{{ carrier_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <!-- Origin Airport -->
+                        <div class="form-group">
+                            <label for="ORIGIN">Origin Airport</label>
+                            <select class="form-control" id="ORIGIN" name="ORIGIN" required>
+                                <option disabled value="">Select Origin Airport</option>
+                                {% for airport_code in ['LGA', 'JFK'] %}
+                                <option value="{{ airport_code }}" {{ 'selected' if request.form.get('ORIGIN') == airport_code else '' }}>{{ airport_code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                                                <!-- Destination Airport -->
+                        <div class="form-group">
+                            <label for="DEST">Destination Airport</label>
+                            <select class="form-control" id="DEST" name="DEST" required>
+                                <option disabled value="">Select Destination Airport</option>
+                                {% for airport_code in ['ATL', 'LAX', 'ORD', 'DFW', 'PHX'] %}
+                                <option value="{{ airport_code }}" {{ 'selected' if request.form.get('DEST') == airport_code else '' }}>{{ airport_code }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                         
+
+
+                        <!-- Scheduled Departure Time -->
+                        <div class="form-group">
+                            <label for="CRS_DEP_TIME">Scheduled Departure Time</label>
+                            <input type="text" class="form-control" id="CRS_DEP_TIME" name="CRS_DEP_TIME"
+                                value="{{ request.form.get('CRS_DEP_TIME', '') }}"
+                                pattern="^(?:[01][0-9]|2[0-3])[0-5][0-9]$"
+                                placeholder="HHMM (0000 to 2359)" required>
+                            <small class="form-text text-muted">Enter time as HHMM (0000 to 2359).</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">Estimate Flight Delay</button>
+                    </fieldset>
+                </form>
+                {% if results %}
+                <h2 class="mt-4">The prediction is: {{ results|int }} minutes</h2>
+                {% endif %}
             </div>
-
-            <!-- Day of Week -->
-            <div class="mb-3">
-                <label class="form-label">Day of Week</label>
-                <select class="form-control" name="DAY_OF_WEEK" required>
-                    <option selected disabled value="">Select Day of Week</option>
-                    <option value="1">Sunday</option>
-                    <option value="2">Monday</option>
-                    <option value="3">Tuesday</option>
-                    <option value="4">Wednesday</option>
-                    <option value="5">Thursday</option>
-                    <option value="6">Friday</option>
-                    <option value="7">Saturday</option>
-                </select>
-            </div>
-
-            <!-- Carrier -->
-            <div class="mb-3">
-                <label class="form-label">Airline Carrier</label>
-                <select class="form-control" name="OP_UNIQUE_CARRIER" required>
-                    <option selected disabled value="">Select Carrier</option>
-                    <option value="AA">AA</option>
-                    <option value="OO">OO</option>
-                    <option value="B6">B6</option>
-                    <option value="9E">9E</option>
-                    <option value="DL">DL</option>
-                    <option value="YX">YX</option>
-                    <option value="UA">UA</option>
-                    <option value="MQ">MQ</option>
-                </select>
-            </div>
-
-            <!-- Origin Airport -->
-            <div class="mb-3">
-                <label class="form-label">Origin Airport</label>
-                <select class="form-control" name="ORIGIN" required>
-                    <option selected disabled value="">Select Origin Airport</option>
-                    <option value="LGA">LGA</option>
-                    <option value="JFK">JFK</option>
-                    <option value="HPN">HPN</option>
-                </select>
-            </div>
-
-            <!-- Destination Airport -->
-            <div class="mb-3">
-                <label class="form-label">Destination Airport</label>
-                <select class="form-control" name="DEST" required>
-                    <option selected disabled value="">Select Destination Airport</option>
-                    <option value="ORD">ORD</option>
-                </select>
-            </div>
-
-            <!-- Scheduled Departure Time (CRS_DEP_TIME) -->
-            <div class="mb-3">
-                <label class="form-label">Scheduled Departure Time</label>
-                <input type="number" class="form-control" name="CRS_DEP_TIME" 
-                    pattern="^(?:[01][0-9]|2[0-3])[0-5][0-9]$" 
-                    placeholder="HHMM (0000 to 2359)" required>
-                <small class="form-text text-muted">Enter time as HHMM (0000 to 2359).</small>
-            </div>
-
-            <div class="mb-3">
-                <input class="btn btn-primary" type="submit" value="Estimate Flight Delay" required />
-            </div>
-        
-        </form>
-        <h2>
-            The prediction is {{ results }}
-        </h2>
-            
+        </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
