@@ -40,9 +40,8 @@ class ModelTrainer:
                 "Gradient Boosting": GradientBoostingRegressor(),
                 "Linear Regression": LinearRegression(),
                 "XGBRegressor": XGBRegressor(),
-                "CatBoosting Regressor": CatBoostRegressor(verbose=False),
                 "AdaBoost Regressor": AdaBoostRegressor(),
-                "LightGBM Regressor": LGBMRegressor()
+                "LightGBM Regressor": LGBMRegressor(),
             }
 
             lgbm_param_grid = {
@@ -64,7 +63,7 @@ class ModelTrainer:
             model_report = evaluate_models(X_train, y_train, X_test, y_test, models, scoring='neg_mean_absolute_error')
 
             sorted_models = sorted(model_report.items(), key=lambda x: x[1], reverse=True)
-            top_5_models = sorted_models[:7]
+            top_5_models = sorted_models[:5]
             logging.info("Top 5 models:")
             for model_name, score in top_5_models:
                 logging.info(f"{model_name}: {-score}")
